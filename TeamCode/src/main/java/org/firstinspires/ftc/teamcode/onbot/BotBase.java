@@ -20,7 +20,7 @@ public class BotBase  extends LinearOpMode {
     private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
     private static final String LABEL_SILVER_MINERAL = "Silver Mineral";
 
-    private static final String VUFORIA_KEY = "";
+    private static final String VUFORIA_KEY = TeamConst.vuforiaKey;
 
     /**
      * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
