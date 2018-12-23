@@ -2,12 +2,15 @@ package org.firstinspires.ftc.teamcode.onbot;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
@@ -35,18 +38,19 @@ public class BotBase  extends LinearOpMode {
     private TFObjectDetector tfod;
 
     /* Declare OpMode members. */
-    protected org.firstinspires.ftc.teamcode.onbot.BotBase.MyBot robot = new org.firstinspires.ftc.teamcode.onbot.BotBase.MyBot();
-
-    protected ElapsedTime runtime = new ElapsedTime();
-    static final double     WHEEL_BASE_INCHES       = 12;
-    static final double     COUNTS_PER_MOTOR_REV    = 288 ;    // eg: TETRIX Motor Encoder
-    static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
-    static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
-    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+    org.firstinspires.ftc.teamcode.onbot.BotBase.MyBot robot = new org.firstinspires.ftc.teamcode.onbot.BotBase.MyBot();
+    ElapsedTime runtime = new ElapsedTime();
+    private static final double     WHEEL_BASE_INCHES       = 12;
+    private static final double     COUNTS_PER_MOTOR_REV    = 288 ;    // eg: TETRIX Motor Encoder
+    private static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
+    private static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
+    private static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
-    static final double     DRIVE_SPEED             = 2.0;
+    private static final double     DRIVE_SPEED             = 2.0;
 
-    static final double     TURN_SPEED              = 0.6;
+    private static final double     TURN_SPEED              = 0.6;
+    static final double     MAX_LIFT_DISTANCE       = 18.0;
+    static final double     MIN_LIFT_DISTANCE       = 6.0;
 
     class MyBot
     {
@@ -56,10 +60,11 @@ public class BotBase  extends LinearOpMode {
         public DcMotor liftDrive = null;
         public Servo markerServo = null;
         public Servo hookServo = null;
+        public DistanceSensor distanceSensor = null;
+
 
         /* local OpMode members. */
         HardwareMap hwMap           =  null;
-        private ElapsedTime period  = new ElapsedTime();
 
         /* Constructor */
         public MyBot(){
@@ -78,6 +83,7 @@ public class BotBase  extends LinearOpMode {
 
             markerServo = hwMap.get(Servo.class, "marker_servo");
             hookServo = hwMap.get(Servo.class, "hook_servo");  //Hook server motor
+            distanceSensor = hardwareMap.get(DistanceSensor.class, "sensor_color_distance");
 
             leftDrive.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
             rightDrive.setDirection(DcMotor.Direction.FORWARD);// Set to FORWARD if using AndyMark motors
@@ -133,25 +139,15 @@ public class BotBase  extends LinearOpMode {
     }
     @Override
     public void runOpMode() {
+        robot.init(hardwareMap); //initialize the hardware
 
-        /*
-         * Initialize the drive system variables.
-         * The init() method of the hardware class does all the work here
-         */
-        robot.init(hardwareMap);
-
-        // Send telemetry message to signify robot waiting;
-        telemetry.addData("Status", "Resetting Encoders");    //
-        telemetry.update();
-
+        // setup encoders by resetting.
         robot.leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.liftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-
+//        robot.liftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.liftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        robot.liftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 /*
         // Send telemetry message to indicate successful Encoder reset
@@ -161,20 +157,18 @@ public class BotBase  extends LinearOpMode {
                 robot.markerServo.getPosition());
         telemetry.update();
 */
-        // Wait for the game to start (driver presses PLAY)
+        //any steps to execute before we enter waiting mode - after init
         beforeWaitForStart();
+        // Wait for the game to start (driver presses PLAY)
         waitForStart();
         // Do the actual work
         runTasks();
 
-
-        telemetry.addData("Path", "Complete");
-        telemetry.update();
     }
     public void dropMarker(){
         runtime.reset();
         while (opModeIsActive() &&
-                (runtime.seconds() < 1.5)){
+                (runtime.seconds() < 1.0)){
             robot.markerServo.setPosition(0.5);
 
         }
@@ -200,9 +194,8 @@ public class BotBase  extends LinearOpMode {
 
     public void resetMarker(){
         runtime.reset();
-
         while (opModeIsActive() &&
-                (runtime.seconds() < 1.5)){
+                (runtime.seconds() < 1.0 )){
             robot.markerServo.setPosition(0);
 
         }
@@ -264,53 +257,40 @@ public class BotBase  extends LinearOpMode {
             // Turn off RUN_TO_POSITION
             robot.leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-            //  sleep(250);   // optional pause after each move
         }
     }
 
     public void liftDrive(double speed,
-                          double liftInches,
                           double timeoutS) {
-        int newLiftTarget;
-
-
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
 
-            // Determine new target position, and pass to motor controller
-            newLiftTarget = robot.liftDrive.getCurrentPosition() + (int)(liftInches * (COUNTS_PER_MOTOR_REV/(0.5 *3.14)) );
-            robot.liftDrive.setTargetPosition(newLiftTarget);
-
-            // Turn On RUN_TO_POSITION
-            robot.liftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
+            double currentDistance = robot.distanceSensor.getDistance(DistanceUnit.CM);
+            telemetry.addData("Lift Position",  " at  "+currentDistance);
+            telemetry.update();
+            if(currentDistance> MAX_LIFT_DISTANCE && speed >0) //DON'T allow beyond max lift distance unless, it is already
+                return;
+            if(currentDistance <= MIN_LIFT_DISTANCE && speed <0) // DON'T GO LOWER than the min lift distance
+                return;
             // reset the timeout time and start motion.
             runtime.reset();
-            robot.liftDrive.setPower(Math.abs(speed));
+            robot.liftDrive.setPower(speed); // start the motor
 
-            // keep looping while we are still active, and there is time left, and both motors are running.
-            // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
-            // its target position, the motion will stop.  This is "safer" in the event that the robot will
-            // always end the motion as soon as possible.
-            // However, if you require that BOTH motors have finished their moves before the robot continues
-            // onto the next step, use (isBusy() || isBusy()) in the loop test.
-            while (opModeIsActive() &&
-                    (runtime.seconds() < timeoutS) &&
-                    (robot.liftDrive.isBusy() )) {
 
-                // Display it for the driver.
-                telemetry.addData("Path1",  "Lifting to %7d ", newLiftTarget);
-                telemetry.addData("Path2",  "Lifting from %7d ",
-                        robot.liftDrive.getCurrentPosition());
+            while (opModeIsActive()
+                    && (runtime.seconds() < timeoutS)
+                  ){
+                currentDistance = robot.distanceSensor.getDistance(DistanceUnit.CM);
+                telemetry.addData("New Lift Position",  " at  "+currentDistance);
                 telemetry.update();
-            }
+                if(currentDistance> MAX_LIFT_DISTANCE && speed >0) //DON'T allow beyond max lift distance unless, it is already
+                    break;
 
+                if(currentDistance <= MIN_LIFT_DISTANCE && speed <0) // DON'T GO LOWER than the min lift distance
+                    break;
+            }
             // Stop all motion;
             robot.liftDrive.setPower(0);
-
-            // Turn off RUN_TO_POSITION
-            robot.liftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         }
     }
@@ -320,8 +300,8 @@ public class BotBase  extends LinearOpMode {
         encoderDrive(DRIVE_SPEED,  inches,  inches, timeoutS);
     }
 
-    protected void lift(double inches, double timeoutS ){
-        liftDrive(0.5,  inches,  timeoutS);
+    protected void lift(boolean upOrDown, double timeoutS ){
+        liftDrive(0.2*(upOrDown?1:-1),   timeoutS);
     }
 
     protected void turnDegrees(double angle, double timeoutS){
@@ -381,6 +361,13 @@ public class BotBase  extends LinearOpMode {
             }
         }
         return goldLocation;
+    }
+
+    protected void latchDown(){
+        lift(true,4.0); // true - extend the lift arm, there by landing the bot
+        hookRelease();
+        lift(false,4.0); // false - retract the lift arm after landing and releasing the hook
+        hookLock();
     }
     public void runTasks(){
 

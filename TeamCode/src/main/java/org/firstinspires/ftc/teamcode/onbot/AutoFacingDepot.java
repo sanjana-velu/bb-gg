@@ -9,11 +9,7 @@ public class AutoFacingDepot extends BotBase{
         initTensorFlow();
     }
     public void runTasks(){
-        // Step through each leg of the path,
-        // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        /**/
-        // lift(20.0,2);
-
+        latchDown();
         String goldLocation = getGoldLocation(5);
 
         if(goldLocation.equals("Left")){

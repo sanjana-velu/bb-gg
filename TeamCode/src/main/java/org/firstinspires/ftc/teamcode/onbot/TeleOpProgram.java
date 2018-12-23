@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.onbot;
 import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
 @TeleOp(name="TeleOpProgram", group="Tournament")
 //@Disabled
 public class TeleOpProgram extends BotBase{
@@ -42,6 +44,13 @@ public class TeleOpProgram extends BotBase{
             if (gamepad1.dpad_up){
                 runtime.reset();
                 while (opModeIsActive() && runtime.seconds() < 0.5) {
+                  double  currentDistance = robot.distanceSensor.getDistance(DistanceUnit.CM);
+                    telemetry.addData("Current Distance",  "Up "+ currentDistance);
+                    telemetry.update();
+                    if(currentDistance> MAX_LIFT_DISTANCE ) //DON'T allow beyond max lift distance unless, it is already
+                        break;
+
+
                     this.robot.liftDrive.setPower(0.2);
                 }
                 this.robot.liftDrive.setPower(0);
@@ -49,6 +58,11 @@ public class TeleOpProgram extends BotBase{
             if (gamepad1.dpad_down ){
                 runtime.reset();
                 while (opModeIsActive() && runtime.seconds() < 0.5) {
+                    double  currentDistance = robot.distanceSensor.getDistance(DistanceUnit.CM);
+                    telemetry.addData("Current Distance",  "Down"+ currentDistance);
+                    telemetry.update();
+                    if(currentDistance <= MIN_LIFT_DISTANCE ) // DON'T GO LOWER than the min lift distance
+                        break;
                     this.robot.liftDrive.setPower(-0.2);
                 }
                 this.robot.liftDrive.setPower(0);
@@ -61,7 +75,7 @@ public class TeleOpProgram extends BotBase{
                 hookRelease();
 
 
-            sleep(10);
+            sleep(5);
         }
     }
 }
