@@ -366,6 +366,10 @@ public class BotBase  extends LinearOpMode {
     protected void latchDown(){
         lift(true,4.0); // true - extend the lift arm, there by landing the bot
         hookRelease();
+
+    }
+
+    protected void latchArmReset(){
         lift(false,4.0); // false - retract the lift arm after landing and releasing the hook
         hookLock();
     }

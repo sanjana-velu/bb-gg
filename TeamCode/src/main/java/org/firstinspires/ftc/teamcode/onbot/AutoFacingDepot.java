@@ -51,6 +51,7 @@ public class AutoFacingDepot extends BotBase{
             runForward(-95, 6); // run towards the crater
         }
 
+        latchArmReset();
         /* Used in Dayton tournament
         runForward(4, 5); // first move forward a little
         turnDegrees(-45, 6.0); // turn left
