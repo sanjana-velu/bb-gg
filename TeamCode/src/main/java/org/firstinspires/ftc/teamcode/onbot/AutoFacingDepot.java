@@ -9,35 +9,38 @@ public class AutoFacingDepot extends BotBase{
         initTensorFlow();
     }
     public void runTasks(){
+        String goldLocation = getGoldLocation(4);
+
         latchDown();
-        String goldLocation = getGoldLocation(5);
 
         if(goldLocation.equals("Left")){
             turnDegrees(-45,8);//Turn to face the gold mineral
-            runForward(36,8);
-            turnDegrees(86,8);
-            runForward(37,8);
+            runForward(31,8);
+            turnDegrees(80,8);
+            runForward(38,8);
             dropMarker();
             resetMarker();
-            runForward(-101,8);
+            turnDegrees(25,8);
+            runForward(-90,8);
 
 
         }else if (goldLocation.equals("Right")){
-            turnDegrees(45,5);
-            runForward(47,5);
-            turnDegrees(-86,5);
-            runForward(37,5);
+            turnDegrees(45,8);//Turn to face the gold mineral
+            runForward(30,8);
+            turnDegrees(-70,8);
+            runForward(38,8);
             dropMarker();
             resetMarker();
-            runForward(101,5);
+            turnDegrees(-28,8);
+            runForward(-90,8);
 
 
         }else if (goldLocation.equals("Center")){
-            runForward(67,11);//move back into the depot while pushing mineral
-            turnDegrees(43,8);// turn to face crater
+            runForward(69,11);//move back into the depot while pushing mineral
+            turnDegrees(55,8);// turn to face crater
             dropMarker();//drop the marker
             resetMarker();//reset the arm
-            runForward(-103,11);//move back into crater
+            runForward(-100,11);//move back into crater
 
         }
         else{
@@ -51,7 +54,7 @@ public class AutoFacingDepot extends BotBase{
             runForward(-95, 6); // run towards the crater
         }
 
-        latchArmReset();
+        //  latchArmReset();
         /* Used in Dayton tournament
         runForward(4, 5); // first move forward a little
         turnDegrees(-45, 6.0); // turn left

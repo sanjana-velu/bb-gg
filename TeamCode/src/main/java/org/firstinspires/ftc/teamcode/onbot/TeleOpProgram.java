@@ -42,27 +42,19 @@ public class TeleOpProgram extends BotBase{
             this.robot.rightDrive.setPower(right);
 
             if (gamepad1.dpad_up){
+                telemetry.addData("Touch Sensor:" ,  ""+robot.touchSensor.isPressed());
+                telemetry.update();
                 runtime.reset();
                 while (opModeIsActive() && runtime.seconds() < 0.5) {
-                  double  currentDistance = robot.distanceSensor.getDistance(DistanceUnit.CM);
-                    telemetry.addData("Current Distance",  "Up "+ currentDistance);
-                    telemetry.update();
-                    if(currentDistance> MAX_LIFT_DISTANCE ) //DON'T allow beyond max lift distance unless, it is already
-                        break;
-
-
-                    this.robot.liftDrive.setPower(0.2);
+                    if(!robot.touchSensor.isPressed() )
+                        this.robot.liftDrive.setPower(0.2);
                 }
                 this.robot.liftDrive.setPower(0);
             }
             if (gamepad1.dpad_down ){
                 runtime.reset();
                 while (opModeIsActive() && runtime.seconds() < 0.5) {
-                    double  currentDistance = robot.distanceSensor.getDistance(DistanceUnit.CM);
-                    telemetry.addData("Current Distance",  "Down"+ currentDistance);
-                    telemetry.update();
-                    if(currentDistance <= MIN_LIFT_DISTANCE ) // DON'T GO LOWER than the min lift distance
-                        break;
+
                     this.robot.liftDrive.setPower(-0.2);
                 }
                 this.robot.liftDrive.setPower(0);

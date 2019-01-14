@@ -4,9 +4,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
+
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -60,7 +61,8 @@ public class BotBase  extends LinearOpMode {
         public DcMotor liftDrive = null;
         public Servo markerServo = null;
         public Servo hookServo = null;
-        public DistanceSensor distanceSensor = null;
+
+        public TouchSensor touchSensor = null;
 
 
         /* local OpMode members. */
@@ -83,7 +85,8 @@ public class BotBase  extends LinearOpMode {
 
             markerServo = hwMap.get(Servo.class, "marker_servo");
             hookServo = hwMap.get(Servo.class, "hook_servo");  //Hook server motor
-            distanceSensor = hardwareMap.get(DistanceSensor.class, "sensor_color_distance");
+//            distanceSensor = hardwareMap.get(DistanceSensor.class, "sensor_color_distance");
+            touchSensor = hardwareMap.get(TouchSensor.class, "touch_sensor");
 
             leftDrive.setDirection(DcMotor.Direction.REVERSE); // Set to REVERSE if using AndyMark motors
             rightDrive.setDirection(DcMotor.Direction.FORWARD);// Set to FORWARD if using AndyMark motors
@@ -265,29 +268,15 @@ public class BotBase  extends LinearOpMode {
         // Ensure that the opmode is still active
         if (opModeIsActive()) {
 
-            double currentDistance = robot.distanceSensor.getDistance(DistanceUnit.CM);
-            telemetry.addData("Lift Position",  " at  "+currentDistance);
-            telemetry.update();
-            if(currentDistance> MAX_LIFT_DISTANCE && speed >0) //DON'T allow beyond max lift distance unless, it is already
-                return;
-            if(currentDistance <= MIN_LIFT_DISTANCE && speed <0) // DON'T GO LOWER than the min lift distance
+            if(robot.touchSensor.isPressed() && speed>0)
                 return;
             // reset the timeout time and start motion.
             runtime.reset();
             robot.liftDrive.setPower(speed); // start the motor
-
-
             while (opModeIsActive()
                     && (runtime.seconds() < timeoutS)
-                  ){
-                currentDistance = robot.distanceSensor.getDistance(DistanceUnit.CM);
-                telemetry.addData("New Lift Position",  " at  "+currentDistance);
-                telemetry.update();
-                if(currentDistance> MAX_LIFT_DISTANCE && speed >0) //DON'T allow beyond max lift distance unless, it is already
-                    break;
-
-                if(currentDistance <= MIN_LIFT_DISTANCE && speed <0) // DON'T GO LOWER than the min lift distance
-                    break;
+                    ){
+                if(robot.touchSensor.isPressed() && speed>0) break;
             }
             // Stop all motion;
             robot.liftDrive.setPower(0);
@@ -301,7 +290,7 @@ public class BotBase  extends LinearOpMode {
     }
 
     protected void lift(boolean upOrDown, double timeoutS ){
-        liftDrive(0.2*(upOrDown?1:-1),   timeoutS);
+        liftDrive(0.3*(upOrDown?1:-1),   timeoutS);
     }
 
     protected void turnDegrees(double angle, double timeoutS){
@@ -364,7 +353,7 @@ public class BotBase  extends LinearOpMode {
     }
 
     protected void latchDown(){
-        lift(true,4.0); // true - extend the lift arm, there by landing the bot
+        lift(false,6.0); // false - extend the lift arm, there by landing the bot
         hookRelease();
 
     }
