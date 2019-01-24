@@ -9,7 +9,7 @@ public class AutoFacingDepot extends BotBase{
         initTensorFlow();
     }
     public void runTasks(){
-        String goldLocation = getGoldLocation(4);
+        String goldLocation = getGoldLocation(3);
 
         latchDown();
 
@@ -53,18 +53,18 @@ public class AutoFacingDepot extends BotBase{
             resetMarker();
             runForward(-95, 6); // run towards the crater
         }
-
+        stopTensorFlow(); //stop tensor flow
         //  latchArmReset();
-        /* Used in Dayton tournament
-        runForward(4, 5); // first move forward a little
-        turnDegrees(-45, 6.0); // turn left
-        runForward(44, 5); // run forward past the mineral marker
-        turnDegrees(101, 6.0); // turn right towards the depot
-        runForward(36, 5); // run into depot
-        dropMarker();
-        resetMarker();
-        runForward(-95, 6); // run towards the crater
+            /* Used in Dayton tournament
+            runForward(4, 5); // first move forward a little
+            turnDegrees(-45, 6.0); // turn left
+            runForward(44, 5); // run forward past the mineral marker
+            turnDegrees(101, 6.0); // turn right towards the depot
+            runForward(36, 5); // run into depot
+            dropMarker();
+            resetMarker();
+            runForward(-95, 6); // run towards the crater
 
-        */
+            */
     }
 }

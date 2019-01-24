@@ -41,21 +41,20 @@ public class TeleOpProgram extends BotBase{
             this.robot.leftDrive.setPower(left);
             this.robot.rightDrive.setPower(right);
 
-            if (gamepad1.dpad_up){
+            if (gamepad1.dpad_down){
                 telemetry.addData("Touch Sensor:" ,  ""+robot.touchSensor.isPressed());
                 telemetry.update();
                 runtime.reset();
                 while (opModeIsActive() && runtime.seconds() < 0.5) {
-                    if(!robot.touchSensor.isPressed() )
-                        this.robot.liftDrive.setPower(0.2);
+                    this.robot.liftDrive.setPower(0.4);
                 }
                 this.robot.liftDrive.setPower(0);
             }
-            if (gamepad1.dpad_down ){
+            if (gamepad1.dpad_up ){
                 runtime.reset();
                 while (opModeIsActive() && runtime.seconds() < 0.5) {
-
-                    this.robot.liftDrive.setPower(-0.2);
+                    if(!robot.touchSensor.isPressed() )
+                        this.robot.liftDrive.setPower(-0.3);
                 }
                 this.robot.liftDrive.setPower(0);
             }

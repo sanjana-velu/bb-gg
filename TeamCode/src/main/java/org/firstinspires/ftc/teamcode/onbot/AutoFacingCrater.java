@@ -8,34 +8,33 @@ public class AutoFacingCrater extends BotBase{
         initTensorFlow();
     }
     public void runTasks(){
-        //  latchDown();
-        String goldLocation = getGoldLocation(5);
+        String goldLocation = getGoldLocation(3);
+
+        latchDown();
 
         if(goldLocation.equals("Left")){
-            turnDegrees(-22,8);//Turn to face the gold mineral
+            turnDegrees(-28,8);//Turn to face the gold mineral
             runForward(40,8); //push gold mineral
             runForward(-15,8); // go back after pushing mineral
             turnDegrees(-85,8); // midturn towards depot
-            runForward(35,8); // run closer to the wall
+            runForward(46,8); // run closer to the wall
             turnDegrees(-49,8); // turn towards depot
-            runForward(65,8); //run inside the depot
+            runForward(42,8); //run inside the depot
             dropMarker();
-            resetMarker();
             runForward(-95,8);
-
+            resetMarker();
 
         }else if (goldLocation.equals("Right")){
-            turnDegrees(-22,8);//Turn to face the gold mineral
-            runForward(43,8); //push gold mineral
+            turnDegrees(28,8);//Turn to face the gold mineral
+            runForward(37,8); //push gold mineral
             runForward(-15,8); // go back after pushing mineral
-            turnDegrees(-85,8); // midturn towards depot
-            runForward(35,8); // run closer to the wall
-            turnDegrees(-49,8); // turn towards depot
-            runForward(65,8); //run inside the depot
+            turnDegrees(-115,8); // midturn towards depot
+            runForward(55,8); // run closer to the wall
+            turnDegrees(-55,8); // turn towards depot
+            runForward(42,8); //run inside the depot
             dropMarker();
+            runForward(-90,8);
             resetMarker();
-            runForward(-95,8);
-
 
         }else if (goldLocation.equals("Center")){
             runForward(35,8); //push gold mineral
@@ -59,6 +58,8 @@ public class AutoFacingCrater extends BotBase{
             resetMarker();
             runForward(-87, 5); // run backwards into crater
         }
+
+        stopTensorFlow();
     /*    // Step through each leg of the path,
         runForward(20, 5); // move forward 20 in
         turnDegrees(-94, 4.0); // turn left

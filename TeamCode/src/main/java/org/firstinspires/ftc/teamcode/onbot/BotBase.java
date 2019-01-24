@@ -47,7 +47,7 @@ public class BotBase  extends LinearOpMode {
     private static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
     private static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
-    private static final double     DRIVE_SPEED             = 2.0;
+    private static final double     DRIVE_SPEED             = 2.5;
 
     private static final double     TURN_SPEED              = 0.6;
     static final double     MAX_LIFT_DISTANCE       = 18.0;
